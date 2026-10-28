@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sin Remedio · Observatorio</title>
+  <meta name="description" content="Observatorio de microexpresión frente a sátira menipea en Sin Remedio, de Antonio Caballero.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <video id="camera" autoplay playsinline muted class="sr-only"></video>
+
+  <main class="stage">
+
+    <div class="scene">
+      <canvas id="scene-canvas"></canvas>
+    </div>
+
+    <div id="cards" class="cards"></div>
+
+    <div id="events" class="events"></div>
+
+    <div class="corner corner-tl">
+      <div class="brand-tag">Observatorio · Sin Remedio</div>
+    </div>
+
+    <div class="corner corner-tr">
+      <div class="live-indicator">
+        <span id="live-dot" class="live-dot"></span>
+        <span id="live-label">en reposo</span>
+      </div>
+    </div>
+
+    <div class="corner corner-bl">
+      <button id="btn-about" class="btn-ghost">Sobre el proyecto</button>
+    </div>
+
+    <div class="corner corner-br">
+      <div id="counter" class="counter-chip"><strong>00</strong> / 05</div>
+      <div class="nav-hint">Deslizar · ↑ ↓</div>
+    </div>
+
+    <div id="countdown" class="countdown" hidden>
+      <div id="cd-number" class="countdown-number">5</div>
+      <div class="countdown-label">Calibrando sensor</div>
+    </div>
+
+    <section id="entry" class="entry">
+      <div class="entry-wrap">
+        <div class="entry-mark">Observatorio · Universidad de los Andes</div>
+        <p class="entry-text">
+          Tus datos personales <strong>no serán tratados</strong>. La cámara se procesa en tu dispositivo. Este es un proyecto académico de humanidades digitales.
+        </p>
+        <button id="btn-enter" class="btn-enter">Aceptar y comenzar</button>
+      </div>
+    </section>
+
+    <section id="ending" class="ending" hidden>
+      <div class="ending-wrap">
+        <div class="ending-title">Lectura completada</div>
+        <div class="ending-body">Gracias por acompañar este estudio</div>
+        <div id="ending-stat" class="ending-stat"></div>
+        <div class="ending-actions">
+          <button id="btn-restart" class="btn-primary">Volver a leer</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <aside id="about" class="about" role="dialog">
+    <button id="btn-about-close" class="about-close" aria-label="Cerrar">×</button>
+
+    <h2>Sobre el proyecto</h2>
+
+    <div class="about-section">
+      <div class="about-label">investigación</div>
+      <p>Esta pieza forma parte de una investigación en humanidades digitales dirigida por <strong>Ivanna Muñoz Martínez</strong>, ingeniera geógrafa y ambiental, especialista en análisis de datos y estudiante de Humanidades Digitales en la Universidad de los Andes.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">objetivo</div>
+      <p>Observar la microexpresión del lector frente a cinco fragmentos satírico-menipeos de <em>Sin Remedio</em> (Antonio Caballero, 1984) y estudiar la respuesta corporal a los distintos registros del humor crítico colombiano del siglo XX.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">cómo funciona</div>
+      <p>La cámara observa el rostro a través de un modelo de visión que corre dentro del propio navegador. El procesamiento ocurre localmente. Ningún frame de video sale del dispositivo. La pieza convierte la observación en mediciones numéricas: tiempo de lectura, intensidad de microgestos, parpadeos y orientación de cabeza.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">qué se guarda</div>
+      <p>Cada sesión queda registrada bajo un identificador anónimo generado por el navegador. Se conservan únicamente mediciones numéricas: duraciones, picos y promedios por fragmento. Ningún embedding del rostro ni dato identificatorio se envía o almacena.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">rangos y métricas</div>
+      <ul>
+        <li>Blendshapes de MediaPipe — 52 valores por frame en rango 0..1</li>
+        <li>Landmarks — 468 puntos en coordenadas 3D normalizadas</li>
+        <li>Transformación facial — matriz 4×4 de pose de cabeza; yaw, pitch, roll derivados en radianes</li>
+        <li>Seis emociones derivadas por combinación lineal de blendshapes (alegría, sorpresa, tristeza, enojo, asco, ironía)</li>
+        <li>Rango de pose por fragmento — amplitud de yaw/pitch/roll durante la lectura</li>
+        <li>Tasa de parpadeo normalizada por minuto</li>
+        <li>Muestreo — aproximadamente 6 Hz durante la lectura</li>
+      </ul>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">marco teórico</div>
+      <p>La investigación lee <em>Sin Remedio</em> bajo la clave de la <strong>sátira menipea</strong>, entendida como modo narrativo y no como género fijo. Se asume la menipea como una rejilla de lectura serio-cómica, en el sentido bajtiniano, que toma las creencias que gobiernan una sociedad (sus doctrinas políticas, religiosas e ideológicas) y las encarna en personajes y escenas para ridiculizarlas, exponiendo la impostura que esconden.</p>
+      <p>La crítica recae sobre las ortodoxias de la época (el dogmatismo revolucionario, la oligarquía, los ritos eclesiásticos, el mito del escritor comprometido) más que sobre las personas que las defienden, siguiendo a <strong>Frye</strong>. Con <strong>Weinbrot</strong> se delimita el fenómeno: la risa menipea cumple una función corrosiva, no regenerativa. El protagonista, Ignacio Escobar, articula la autoparodia del sabio descrita por <strong>Relihan</strong>.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">parámetros de close reading</div>
+      <ul>
+        <li><strong>Ideas y valores en cuestión</strong> — qué ortodoxia pone en evidencia cada pasaje</li>
+        <li><strong>Discursos solemnes</strong> — quién habla desde qué autoridad y cómo sus palabras lo contradicen</li>
+        <li><strong>Formas y recursos de la burla</strong> — prosimetrum, cambios de registro, enumeraciones, catálogos</li>
+        <li><strong>Risa, cuerpo y gravedad</strong> — convivencia del humor con la muerte, el fracaso, el poder; recurso al bajo corporal</li>
+        <li><strong>Lugares y jerarquías de Bogotá</strong> — espacialidad satírica, descenso a los bajos fondos, análisis geocrítico</li>
+      </ul>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">correspondencia con la medición</div>
+      <p>Las métricas corporales recogidas se cruzan con los parámetros literarios así: <strong>alegría</strong> dialoga con la risa menipea corrosiva; <strong>asombro</strong> y <strong>sorpresa</strong> rastrean el momento en que la ortodoxia cae en ridículo; <strong>tristeza</strong> y <strong>enojo</strong> captan la gravedad serio-cómica; <strong>asco</strong> responde al grotesco y al bajo corporal; <strong>ironía</strong> y la asimetría facial señalan el reconocimiento del juego de registros. La orientación de cabeza y la tasa de parpadeo complementan como indicadores de atención, de inclinación hacia o apartamiento del texto.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">herramientas</div>
+      <ul>
+        <li>MediaPipe Face Landmarker · Google — 468 puntos + 52 blendshapes + pose</li>
+        <li>Three.js r160 — render 3D del maniquí</li>
+        <li>Canonical face model · Google — pose neutra de referencia</li>
+        <li>Supabase — persistencia y autenticación</li>
+        <li>Archivo + Fraunces + JetBrains Mono — tipografías</li>
+      </ul>
+      <p>La construcción se apoyó en un modelo de lenguaje (Claude Opus 4.7 de Anthropic) bajo un esquema <em>human-in-the-loop</em>: cada decisión de diseño, redacción, selección y configuración pasó por la revisión y aprobación de la investigadora.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">material literario</div>
+      <p>Los textos pertenecen a <em>Sin Remedio</em> (1984) de Antonio Caballero, Alfaguara. Se citan con fines académicos.</p>
+    </div>
+
+    <div class="about-section">
+      <div class="about-label">contacto</div>
+      <p>Para consultas, retiro de participación o detalles metodológicos: <a href="mailto:il.munoz@uniandes.edu.co">il.munoz@uniandes.edu.co</a></p>
+      <p>Universidad de los Andes · 2026</p>
+    </div>
+  </aside>
+  <div id="scrim" class="scrim"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
